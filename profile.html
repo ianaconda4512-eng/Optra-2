@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jesse Daniels — Optra</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080B12;
+    --bg2: #0D1120;
+    --bg3: #111827;
+    --accent: #7C5CFC;
+    --accent2: #A78BFA;
+    --accent3: #F59E0B;
+    --text: #F1F5F9;
+    --muted: #64748B;
+    --border: rgba(124, 92, 252, 0.15);
+    --card: rgba(255,255,255,0.03);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Background effects */
+  .bg-glow {
+    position: fixed;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(124,92,252,0.1) 0%, transparent 70%);
+    top: -100px; left: 50%; transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .bg-grid {
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(124,92,252,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,92,252,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* MAIN CONTAINER */
+  .container {
+    width: 100%;
+    max-width: 480px;
+    padding: 48px 20px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* OPTRA BRAND BAR */
+  .brand-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  .brand-link {
+    display: flex; align-items: center; gap: 6px;
+    text-decoration: none;
+    background: rgba(124,92,252,0.08);
+    border: 1px solid rgba(124,92,252,0.2);
+    border-radius: 100px;
+    padding: 6px 14px;
+    transition: all 0.2s;
+  }
+
+  .brand-link:hover {
+    background: rgba(124,92,252,0.15);
+    border-color: rgba(124,92,252,0.4);
+  }
+
+  .brand-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 0.85rem;
+    background: linear-gradient(135deg, #fff, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .brand-logo span { -webkit-text-fill-color: var(--accent); color: var(--accent); }
+
+  /* PROFILE HEADER */
+  .profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .avatar-wrap {
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    border: 3px solid rgba(124,92,252,0.3);
+    box-shadow: 0 0 30px rgba(124,92,252,0.3);
+  }
+
+  .verified {
+    position: absolute;
+    bottom: 2px; right: 2px;
+    width: 24px; height: 24px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem;
+    border: 2px solid var(--bg);
+  }
+
+  .profile-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .profile-handle {
+    color: var(--accent2);
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  .profile-bio {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    max-width: 320px;
+    margin-bottom: 16px;
+  }
+
+  /* SOCIAL ICONS */
+  .socials {
+    display: flex; gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .social-btn {
+    width: 36px; height: 36px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    color: var(--muted);
+  }
+
+  .social-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  /* STATS ROW */
+  .stats-row {
+    display: flex; gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .stat-item {
+    flex: 1;
+    padding: 14px 10px;
+    text-align: center;
+    background: var(--bg2);
+  }
+
+  .stat-item:not(:last-child) {
+    border-right: 1px solid var(--border);
+  }
+
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .stat-key {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 0.03em;
+  }
+
+  /* TIP CARD */
+  .tip-card {
+    background: linear-gradient(135deg, rgba(124,92,252,0.12), rgba(245,158,11,0.06));
+    border: 1px solid rgba(124,92,252,0.25);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.6s ease 0.15s both;
+  }
+
+  .tip-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .tip-amounts {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .tip-amount {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .tip-amount:hover, .tip-amount.active {
+    background: rgba(124,92,252,0.15);
+    border-color: var(--accent);
+    color: var(--accent2);
+  }
+
+  .tip-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 0 20px rgba(124,92,252,0.3);
+    letter-spacing: 0.01em;
+  }
+
+  .tip-btn:hover {
+    background: #8B6EFD;
+    transform: translateY(-1px);
+    box-shadow: 0 0 30px rgba(124,92,252,0.5);
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+
+  /* PRODUCT CARDS */
+  .products-section {
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .product-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(124,92,252,0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .product-card:hover {
+    border-color: rgba(124,92,252,0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  .product-card:hover::before { opacity: 1; }
+
+  .product-thumb {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .product-info { flex: 1; min-width: 0; }
+
+  .product-name {
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .product-meta {
+    font-size: 0.75rem;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .product-type {
+    background: rgba(124,92,252,0.1);
+    color: var(--accent2);
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  .product-price {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--accent3);
+    flex-shrink: 0;
+  }
+
+  /* LINKS SECTION */
+  .links-section {
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.25s both;
+  }
+
+  .link-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 15px 18px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    font-size: 0.92rem;
+    font-weight: 500;
+  }
+
+  .link-card:hover {
+    border-color: rgba(124,92,252,0.35);
+    transform: translateY(-2px);
+    background: rgba(124,92,252,0.05);
+  }
+
+  .link-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .link-arrow {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+  }
+
+  .link-card:hover .link-arrow {
+    transform: translateX(3px);
+    color: var(--accent);
+  }
+
+  /* BOOKING SECTION */
+  .booking-section {
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  .booking-card {
+    background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(124,92,252,0.06));
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .booking-card:hover {
+    border-color: rgba(245,158,11,0.4);
+    transform: translateY(-2px);
+  }
+
+  .booking-icon {
+    width: 48px; height: 48px;
+    background: rgba(245,158,11,0.1);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .booking-info h4 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 3px;
+  }
+
+  .booking-info p {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .booking-arrow {
+    margin-left: auto;
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent3);
+    white-space: nowrap;
+  }
+
+  /* TIP MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 24px 24px 0 0;
+    padding: 28px 24px 40px;
+    width: 100%;
+    max-width: 480px;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-handle {
+    width: 36px; height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 100px;
+    margin: 0 auto 20px;
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+
+  .modal-sub {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+  }
+
+  .modal-methods {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .method-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .method-btn:hover, .method-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,92,252,0.1);
+    color: var(--accent2);
+  }
+
+  .method-icon { font-size: 1.4rem; display: block; margin-bottom: 6px; }
+
+  .modal-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-input::placeholder { color: var(--muted); }
+
+  .modal-pay-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 0 20px rgba(124,92,252,0.3);
+  }
+
+  .modal-pay-btn:hover {
+    background: #8B6EFD;
+    box-shadow: 0 0 30px rgba(124,92,252,0.5);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: var(--muted);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+  /* FOOTER */
+  .profile-footer {
+    text-align: center;
+    margin-top: 32px;
+    animation: fadeUp 0.6s ease 0.4s both;
+  }
+
+  .powered-by {
+    display: inline-flex; align-items: center; gap: 6px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.78rem;
+    transition: color 0.2s;
+  }
+
+  .powered-by:hover { color: var(--text); }
+
+  .powered-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 0.85rem;
+    background: linear-gradient(135deg, #fff, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .powered-logo span { -webkit-text-fill-color: var(--accent); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<!-- TIP MODAL -->
+<div class="modal-overlay" id="tipModal">
+  <div class="modal" style="position:relative;">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-handle"></div>
+    <div class="modal-title">Support Jesse 🙌</div>
+    <div class="modal-sub">Choose your payment method</div>
+    <div class="modal-methods">
+      <div class="method-btn active" onclick="selectMethod(this)">
+        <span class="method-icon">🟢</span>Paystack
+      </div>
+      <div class="method-btn" onclick="selectMethod(this)">
+        <span class="method-icon">🔵</span>Flutterwave
+      </div>
+      <div class="method-btn" onclick="selectMethod(this)">
+        <span class="method-icon">📱</span>Mobile Money
+      </div>
+      <div class="method-btn" onclick="selectMethod(this)">
+        <span class="method-icon">💳</span>Card
+      </div>
+    </div>
+    <input type="text" class="modal-input" placeholder="Your name (optional)">
+    <input type="text" class="modal-input" placeholder="Leave a message (optional)">
+    <button class="modal-pay-btn" onclick="closeModal()">Send Tip via Optra Pay →</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- BRAND BAR -->
+  <div class="brand-bar">
+    <a href="optra-landing.html" class="brand-link">
+      <span class="brand-logo">Opt<span>ra</span></span>
+      <span style="color:var(--muted);font-size:0.75rem;">· optra.co/jesse</span>
+    </a>
+  </div>
+
+  <!-- PROFILE HEADER -->
+  <div class="profile-header">
+    <div class="avatar-wrap">
+      <div class="avatar">JD</div>
+      <div class="verified">✓</div>
+    </div>
+    <div class="profile-name">Jesse Daniels</div>
+    <div class="profile-handle">@jesse</div>
+    <div class="profile-bio">Content creator · Digital products · Helping African creators monetize their craft 🌍</div>
+    <div class="socials">
+      <a href="#" class="social-btn" title="TikTok">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+      </a>
+      <a href="#" class="social-btn" title="Instagram">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" class="social-btn" title="YouTube">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M23 7s-.3-2-1.2-2.7c-1.1-1.2-2.4-1.2-3-1.3C16.4 3 12 3 12 3s-4.4 0-6.8.1c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.2.3 4.2s.3 2 1.2 2.7c1.1 1.2 2.6 1.1 3.3 1.2C7.2 21.5 12 21.5 12 21.5s4.4 0 6.8-.2c.6-.1 1.9-.1 3-1.3.9-.7 1.2-2.7 1.2-2.7s.3-2.1.3-4.2v-2C23.3 9.1 23 7 23 7zM9.7 15.5V8.4l8.1 3.6-8.1 3.5z"/></svg>
+      </a>
+      <a href="#" class="social-btn" title="Twitter/X">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-val">45K</div>
+      <div class="stat-key">Followers</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">12</div>
+      <div class="stat-key">Products</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">340</div>
+      <div class="stat-key">Sales</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">4.9 ⭐</div>
+      <div class="stat-key">Rating</div>
+    </div>
+  </div>
+
+  <!-- TIP CARD -->
+  <div class="tip-card">
+    <div class="tip-label">Support Jesse via Optra Pay</div>
+    <div class="tip-amounts">
+      <div class="tip-amount active" onclick="selectTip(this)">$1</div>
+      <div class="tip-amount" onclick="selectTip(this)">$3</div>
+      <div class="tip-amount" onclick="selectTip(this)">$5</div>
+      <div class="tip-amount" onclick="selectTip(this)">$10</div>
+    </div>
+    <button class="tip-btn" onclick="openModal()">Send a Tip 🙌</button>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="products-section">
+    <div class="section-label">Products</div>
+
+    <a href="optra-checkout.html" class="product-card">
+      <div class="product-thumb" style="background:rgba(124,92,252,0.1);">🎨</div>
+      <div class="product-info">
+        <div class="product-name">Lightroom Preset Pack Vol.1</div>
+        <div class="product-meta">
+          <span class="product-type">Digital Download</span>
+          47 sold
+        </div>
+      </div>
+      <div class="product-price">$3</div>
+    </a>
+
+    <a href="optra-checkout.html" class="product-card">
+      <div class="product-thumb" style="background:rgba(245,158,11,0.1);">📖</div>
+      <div class="product-info">
+        <div class="product-name">Content Strategy eBook</div>
+        <div class="product-meta">
+          <span class="product-type">PDF</span>
+          23 sold
+        </div>
+      </div>
+      <div class="product-price">$2</div>
+    </a>
+
+    <a href="optra-checkout.html" class="product-card">
+      <div class="product-thumb" style="background:rgba(16,185,129,0.1);">🎬</div>
+      <div class="product-info">
+        <div class="product-name">TikTok Growth Masterclass</div>
+        <div class="product-meta">
+          <span class="product-type">Video Course</span>
+          89 sold
+        </div>
+      </div>
+      <div class="product-price">$8</div>
+    </a>
+
+  </div>
+
+  <!-- LINKS -->
+  <div class="links-section">
+    <div class="section-label">Links</div>
+
+    <a href="#" class="link-card">
+      <div class="link-icon" style="background:rgba(255,0,80,0.1);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0050"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+      </div>
+      My TikTok Page
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a href="#" class="link-card">
+      <div class="link-icon" style="background:rgba(255,0,0,0.1);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ff0000"><path d="M23 7s-.3-2-1.2-2.7c-1.1-1.2-2.4-1.2-3-1.3C16.4 3 12 3 12 3s-4.4 0-6.8.1c-.6.1-1.9.1-3 1.3C1.3 5 1 7 1 7S.7 9.1.7 11.3v2c0 2.1.3 4.2.3 4.2s.3 2 1.2 2.7c1.1 1.2 2.6 1.1 3.3 1.2C7.2 21.5 12 21.5 12 21.5s4.4 0 6.8-.2c.6-.1 1.9-.1 3-1.3.9-.7 1.2-2.7 1.2-2.7s.3-2.1.3-4.2v-2C23.3 9.1 23 7 23 7zM9.7 15.5V8.4l8.1 3.6-8.1 3.5z"/></svg>
+      </div>
+      YouTube Channel
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a href="#" class="link-card">
+      <div class="link-icon" style="background:rgba(124,92,252,0.1);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#A78BFA" stroke="none"/></svg>
+      </div>
+      Instagram
+      <span class="link-arrow">→</span>
+    </a>
+
+  </div>
+
+  <!-- BOOKING -->
+  <div class="booking-section">
+    <div class="section-label">Work With Me</div>
+    <a href="optra-onboarding.html" class="booking-card">
+      <div class="booking-icon">📅</div>
+      <div class="booking-info">
+        <h4>Book a 1-on-1 Session</h4>
+        <p>Content strategy, brand deals, growth consulting</p>
+      </div>
+      <div class="booking-arrow">Book →</div>
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="profile-footer">
+    <a href="optra-landing.html" class="powered-by">
+      Powered by <span class="powered-logo">Opt<span>ra</span></span>
+      · Create your free page
+    </a>
+  </div>
+
+</div>
+
+<script>
+  function openModal() {
+    document.getElementById('tipModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('tipModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function selectTip(el) {
+    document.querySelectorAll('.tip-amount').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function selectMethod(el) {
+    document.querySelectorAll('.method-btn').forEach(m => m.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  document.getElementById('tipModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+</body>
+</html>

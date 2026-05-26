@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Optra Pay — Checkout</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080B12;
+    --bg2: #0D1120;
+    --bg3: #111827;
+    --accent: #7C5CFC;
+    --accent2: #A78BFA;
+    --accent3: #F59E0B;
+    --green: #10B981;
+    --text: #F1F5F9;
+    --muted: #64748B;
+    --border: rgba(124, 92, 252, 0.15);
+    --card: rgba(255,255,255,0.03);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .bg-glow {
+    position: fixed;
+    width: 600px; height: 400px;
+    background: radial-gradient(circle, rgba(124,92,252,0.08) 0%, transparent 70%);
+    top: 0; left: 50%; transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  /* STEPS */
+  .checkout-wrapper {
+    width: 100%;
+    max-width: 440px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* OPTRA BAR */
+  .optra-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .optra-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    background: linear-gradient(135deg, #fff, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .optra-logo span { -webkit-text-fill-color: var(--accent); }
+
+  .secure-badge {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.75rem;
+    color: var(--green);
+    background: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 100px;
+    padding: 5px 12px;
+  }
+
+  /* PROGRESS */
+  .progress-steps {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 28px;
+  }
+
+  .step-dot {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    flex: 1;
+    position: relative;
+  }
+
+  .step-dot:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 14px; left: 60%; right: -40%;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .step-dot.done:not(:last-child)::after,
+  .step-dot.active:not(:last-child)::after {
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  .step-circle {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+    background: var(--bg2);
+    transition: all 0.3s;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-dot.active .step-circle {
+    border-color: var(--accent);
+    background: rgba(124,92,252,0.15);
+    color: var(--accent2);
+  }
+
+  .step-dot.done .step-circle {
+    border-color: var(--green);
+    background: rgba(16,185,129,0.1);
+    color: var(--green);
+  }
+
+  .step-name {
+    font-size: 0.65rem;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .step-dot.active .step-name { color: var(--accent2); }
+  .step-dot.done .step-name { color: var(--green); }
+
+  /* CARD */
+  .checkout-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  /* PRODUCT SUMMARY */
+  .product-summary {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px;
+    background: rgba(124,92,252,0.04);
+  }
+
+  .product-thumb {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .product-details { flex: 1; min-width: 0; }
+
+  .product-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .product-seller {
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .seller-avatar {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.5rem;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .product-price-tag {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--accent3);
+    flex-shrink: 0;
+  }
+
+  /* PANELS */
+  .checkout-panel { display: none; padding: 24px; }
+  .checkout-panel.active { display: block; }
+
+  /* METHOD SELECTION */
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .method-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .method-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .method-card:hover {
+    border-color: rgba(124,92,252,0.35);
+    background: rgba(124,92,252,0.05);
+  }
+
+  .method-card.selected {
+    border-color: var(--accent);
+    background: rgba(124,92,252,0.1);
+  }
+
+  .method-icon { font-size: 1.6rem; margin-bottom: 6px; display: block; }
+
+  .method-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .method-desc {
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+
+  .method-card.selected .method-name { color: var(--accent2); }
+
+  /* FORM */
+  .form-group { margin-bottom: 14px; }
+
+  .form-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-size: 0.92rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--muted); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* CARD INPUT STYLING */
+  .card-input-wrap {
+    position: relative;
+  }
+
+  .card-icons {
+    position: absolute;
+    right: 14px; top: 50%; transform: translateY(-50%);
+    display: flex; gap: 4px;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  /* ORDER SUMMARY */
+  .order-summary {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .order-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    color: var(--muted);
+  }
+
+  .order-row:last-child {
+    margin-bottom: 0;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+  }
+
+  .order-row:last-child span:last-child { color: var(--accent3); }
+
+  /* PAY BUTTON */
+  .pay-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 0 24px rgba(124,92,252,0.35);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    letter-spacing: 0.01em;
+  }
+
+  .pay-btn:hover {
+    background: #8B6EFD;
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px rgba(124,92,252,0.5);
+  }
+
+  .pay-btn:active { transform: translateY(0); }
+
+  /* LOADING STATE */
+  .pay-btn.loading {
+    background: rgba(124,92,252,0.5);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  .pay-btn.loading .spinner { display: block; }
+  .pay-btn.loading .btn-text { display: none; }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* SUCCESS SCREEN */
+  .success-screen {
+    text-align: center;
+    padding: 40px 24px;
+  }
+
+  .success-icon {
+    width: 72px; height: 72px;
+    background: rgba(16,185,129,0.1);
+    border: 2px solid rgba(16,185,129,0.3);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 1.8rem;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .success-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .success-sub {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .success-detail {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .success-detail-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.82rem;
+    margin-bottom: 8px;
+    color: var(--muted);
+  }
+
+  .success-detail-row:last-child { margin-bottom: 0; }
+  .success-detail-row span:last-child { color: var(--text); font-weight: 600; }
+
+  .download-btn {
+    width: 100%;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+  }
+
+  .download-btn:hover { background: #0ea572; transform: translateY(-1px); }
+
+  .back-btn {
+    width: 100%;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .back-btn:hover { border-color: var(--muted); color: var(--text); }
+
+  /* MOMO SPECIFIC */
+  .momo-prompt {
+    background: rgba(255,183,0,0.06);
+    border: 1px solid rgba(255,183,0,0.2);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 14px;
+    font-size: 0.82rem;
+    color: var(--accent3);
+    line-height: 1.6;
+    display: none;
+  }
+
+  .momo-prompt.visible { display: block; }
+
+  /* TRUST BADGES */
+  .trust-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .trust-item {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  /* BACK LINK */
+  .back-link {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--muted);
+    font-size: 0.82rem;
+    text-decoration: none;
+    margin-bottom: 16px;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: var(--text); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .checkout-card { animation: fadeUp 0.5s ease; }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="checkout-wrapper">
+
+  <!-- OPTRA BAR -->
+  <div class="optra-bar">
+    <div class="optra-logo">Opt<span>ra</span> Pay</div>
+    <div class="secure-badge">🔒 Secured by Optra</div>
+  </div>
+
+  <!-- BACK LINK -->
+  <a href="optra-profile.html" class="back-link">← Back to Jesse's page</a>
+
+  <!-- PROGRESS -->
+  <div class="progress-steps" id="progressSteps">
+    <div class="step-dot active" id="stepDot1">
+      <div class="step-circle">1</div>
+      <div class="step-name">Method</div>
+    </div>
+    <div class="step-dot" id="stepDot2">
+      <div class="step-circle">2</div>
+      <div class="step-name">Details</div>
+    </div>
+    <div class="step-dot" id="stepDot3">
+      <div class="step-circle">3</div>
+      <div class="step-name">Confirm</div>
+    </div>
+    <div class="step-dot" id="stepDot4">
+      <div class="step-circle">✓</div>
+      <div class="step-name">Done</div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT CARD -->
+  <div class="checkout-card">
+
+    <!-- PRODUCT SUMMARY -->
+    <div class="product-summary" id="productSummary">
+      <div class="product-thumb" style="background:rgba(16,185,129,0.1);">🎬</div>
+      <div class="product-details">
+        <div class="product-title">TikTok Growth Masterclass</div>
+        <div class="product-seller">
+          <div class="seller-avatar">JD</div>
+          Jesse Daniels · optra.co/jesse
+        </div>
+      </div>
+      <div class="product-price-tag">$8</div>
+    </div>
+
+    <!-- STEP 1 — PAYMENT METHOD -->
+    <div class="checkout-panel active" id="step1">
+      <div class="panel-title">Choose payment method</div>
+      <div class="method-grid">
+        <div class="method-card selected" onclick="selectMethod(this, 'paystack')">
+          <span class="method-icon">🟢</span>
+          <div class="method-name">Paystack</div>
+          <div class="method-desc">Card & Bank</div>
+        </div>
+        <div class="method-card" onclick="selectMethod(this, 'flutterwave')">
+          <span class="method-icon">🔵</span>
+          <div class="method-name">Flutterwave</div>
+          <div class="method-desc">Card & Transfer</div>
+        </div>
+        <div class="method-card" onclick="selectMethod(this, 'momo')">
+          <span class="method-icon">📱</span>
+          <div class="method-name">Mobile Money</div>
+          <div class="method-desc">MTN · Telecel · GH</div>
+        </div>
+        <div class="method-card" onclick="selectMethod(this, 'opay')">
+          <span class="method-icon">⚡</span>
+          <div class="method-name">Opay</div>
+          <div class="method-desc">Wallet · NG</div>
+        </div>
+        <div class="method-card" onclick="selectMethod(this, 'kuda')">
+          <span class="method-icon">🟣</span>
+          <div class="method-name">Kuda</div>
+          <div class="method-desc">Bank · NG</div>
+        </div>
+        <div class="method-card" onclick="selectMethod(this, 'transfer')">
+          <span class="method-icon">🏦</span>
+          <div class="method-name">Bank Transfer</div>
+          <div class="method-desc">GH · NG · All</div>
+        </div>
+        <div class="method-card" onclick="selectMethod(this, 'card')">
+          <span class="method-icon">💳</span>
+          <div class="method-name">Card</div>
+          <div class="method-desc">Visa · Mastercard</div>
+        </div>
+      </div>
+
+      <div class="order-summary">
+        <div class="order-row"><span>TikTok Growth Masterclass</span><span>$8.00</span></div>
+        <div class="order-row"><span>Platform fee</span><span>$0.00</span></div>
+        <div class="order-row"><span>Total</span><span>$8.00</span></div>
+      </div>
+
+      <button class="pay-btn" onclick="goToStep(2)">
+        <span class="btn-text">Continue →</span>
+      </button>
+
+      <div class="trust-row">
+        <div class="trust-item">🔒 SSL Encrypted</div>
+        <div class="trust-item">⚡ Instant Delivery</div>
+        <div class="trust-item">↩️ Refund Policy</div>
+      </div>
+    </div>
+
+    <!-- STEP 2 — DETAILS -->
+    <div class="checkout-panel" id="step2">
+      <div class="panel-title">Your details</div>
+
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-input" placeholder="e.g. Ama Mensah" id="buyerName">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" placeholder="your@email.com" id="buyerEmail">
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:5px;">📦 Your download link will be sent here</div>
+      </div>
+
+      <!-- MOMO SPECIFIC -->
+      <div class="momo-prompt" id="momoPrompt">
+        📱 Enter your Mobile Money number below. You'll receive a payment prompt on your phone to confirm.
+      </div>
+
+      <div class="form-group" id="momoField" style="display:none;">
+        <label class="form-label">Mobile Money Number</label>
+        <input type="tel" class="form-input" placeholder="e.g. 0244000000">
+      </div>
+
+      <!-- CARD SPECIFIC -->
+      <div id="cardFields">
+        <div class="form-group">
+          <label class="form-label">Card Number</label>
+          <div class="card-input-wrap">
+            <input type="text" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19" id="cardNum" oninput="formatCard(this)">
+            <div class="card-icons">VISA · MC</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Expiry</label>
+            <input type="text" class="form-input" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">CVV</label>
+            <input type="text" class="form-input" placeholder="123" maxlength="3">
+          </div>
+        </div>
+      </div>
+
+      <button class="pay-btn" onclick="goToStep(3)">
+        <span class="btn-text">Review Order →</span>
+      </button>
+
+      <button class="back-btn" style="margin-top:10px;" onclick="goToStep(1)">← Back</button>
+    </div>
+
+    <!-- STEP 3 — CONFIRM -->
+    <div class="checkout-panel" id="step3">
+      <div class="panel-title">Confirm & Pay</div>
+
+      <div class="order-summary" style="margin-bottom:16px;">
+        <div class="order-row"><span>Product</span><span>TikTok Growth Masterclass</span></div>
+        <div class="order-row"><span>Seller</span><span>Jesse Daniels</span></div>
+        <div class="order-row"><span>Email</span><span id="confirmEmail">—</span></div>
+        <div class="order-row"><span>Payment</span><span id="confirmMethod">Paystack</span></div>
+        <div class="order-row"><span>Total</span><span>$8.00</span></div>
+      </div>
+
+      <div style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15);border-radius:12px;padding:14px;margin-bottom:16px;font-size:0.82rem;color:var(--muted);line-height:1.6;">
+        ⚡ Your download link will be sent to your email <strong style="color:var(--text);">instantly</strong> after payment. No waiting.
+      </div>
+
+      <button class="pay-btn" id="payNowBtn" onclick="processPayment()">
+        <div class="spinner"></div>
+        <span class="btn-text">Pay $8.00 via Optra Pay →</span>
+      </button>
+
+      <button class="back-btn" style="margin-top:10px;" onclick="goToStep(2)">← Back</button>
+
+      <div class="trust-row">
+        <div class="trust-item">🔒 256-bit SSL</div>
+        <div class="trust-item">🛡 Buyer Protected</div>
+      </div>
+    </div>
+
+    <!-- STEP 4 — SUCCESS -->
+    <div class="checkout-panel" id="step4">
+      <div class="success-screen">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Payment Successful!</div>
+        <div class="success-sub">Your purchase is confirmed. Check your email for the download link — it should arrive within seconds.</div>
+
+        <div class="success-detail">
+          <div class="success-detail-row"><span>Product</span><span>TikTok Growth Masterclass</span></div>
+          <div class="success-detail-row"><span>Amount Paid</span><span style="color:var(--accent3);">$8.00</span></div>
+          <div class="success-detail-row"><span>Transaction ID</span><span>OPT-2026-7F4K2</span></div>
+          <div class="success-detail-row"><span>Delivered to</span><span id="successEmail">your@email.com</span></div>
+        </div>
+
+        <button class="download-btn">⬇️ Download Now</button>
+        <button class="back-btn" onclick="resetFlow()">← Back to Jesse's page</button>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);text-align:center;">
+          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;">Enjoying Optra? Create your own page free</div>
+          <a href="optra-landing.html" style="color:var(--accent2);font-size:0.82rem;font-weight:600;text-decoration:none;">Get started at optra.co →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  let selectedMethod = 'paystack';
+
+  function selectMethod(el, method) {
+    document.querySelectorAll('.method-card').forEach(m => m.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedMethod = method;
+  }
+
+  function goToStep(step) {
+    // Validate step 2
+    if (step === 3) {
+      const name = document.getElementById('buyerName').value;
+      const email = document.getElementById('buyerEmail').value;
+      if (!name || !email || !email.includes('@')) {
+        if (!name) document.getElementById('buyerName').style.borderColor = '#ef4444';
+        if (!email || !email.includes('@')) document.getElementById('buyerEmail').style.borderColor = '#ef4444';
+        setTimeout(() => {
+          document.getElementById('buyerName').style.borderColor = '';
+          document.getElementById('buyerEmail').style.borderColor = '';
+        }, 2000);
+        return;
+      }
+      document.getElementById('confirmEmail').textContent = email;
+      document.getElementById('confirmMethod').textContent =
+        selectedMethod === 'paystack' ? 'Paystack' :
+        selectedMethod === 'flutterwave' ? 'Flutterwave' :
+        selectedMethod === 'momo' ? 'Mobile Money' : 'Card';
+    }
+
+    // Update step 2 fields based on method
+    if (step === 2) {
+      const isMomo = selectedMethod === 'momo';
+      const isCard = selectedMethod === 'card';
+      document.getElementById('momoPrompt').classList.toggle('visible', isMomo);
+      document.getElementById('momoField').style.display = isMomo ? 'block' : 'none';
+      document.getElementById('cardFields').style.display = (isCard || selectedMethod === 'paystack' || selectedMethod === 'flutterwave') ? 'block' : 'none';
+    }
+
+    document.querySelectorAll('.checkout-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('step' + step).classList.add('active');
+    updateProgress(step);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateProgress(step) {
+    for (let i = 1; i <= 4; i++) {
+      const dot = document.getElementById('stepDot' + i);
+      dot.classList.remove('active', 'done');
+      if (i < step) dot.classList.add('done');
+      else if (i === step) dot.classList.add('active');
+    }
+  }
+
+  function processPayment() {
+    const btn = document.getElementById('payNowBtn');
+    btn.classList.add('loading');
+
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      const email = document.getElementById('buyerEmail').value || 'your@email.com';
+      document.getElementById('successEmail').textContent = email;
+      goToStep(4);
+    }, 2200);
+  }
+
+  function resetFlow() {
+    goToStep(1);
+    document.getElementById('buyerName').value = '';
+    document.getElementById('buyerEmail').value = '';
+  }
+
+  function formatCard(input) {
+    let val = input.value.replace(/\D/g, '').substring(0, 16);
+    input.value = val.replace(/(.{4})/g, '$1 ').trim();
+  }
+
+  function formatExpiry(input) {
+    let val = input.value.replace(/\D/g, '');
+    if (val.length >= 2) val = val.substring(0, 2) + ' / ' + val.substring(2);
+    input.value = val;
+  }
+</script>
+</body>
+</html>

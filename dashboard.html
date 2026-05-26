@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Optra Dashboard — Jesse Daniels</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080B12;
+    --bg2: #0D1120;
+    --bg3: #111827;
+    --bg4: #1a2035;
+    --accent: #7C5CFC;
+    --accent2: #A78BFA;
+    --accent3: #F59E0B;
+    --green: #10B981;
+    --red: #EF4444;
+    --text: #F1F5F9;
+    --muted: #64748B;
+    --border: rgba(124, 92, 252, 0.15);
+    --card: rgba(255,255,255,0.03);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 50;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .logo span { -webkit-text-fill-color: var(--accent); color: var(--accent); }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+    overflow-y: auto;
+  }
+
+  .nav-section {
+    margin-bottom: 24px;
+  }
+
+  .nav-section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 8px;
+    margin-bottom: 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-decoration: none;
+    margin-bottom: 2px;
+  }
+
+  .nav-item:hover {
+    background: rgba(124,92,252,0.08);
+    color: var(--text);
+  }
+
+  .nav-item.active {
+    background: rgba(124,92,252,0.12);
+    color: var(--accent2);
+    border: 1px solid rgba(124,92,252,0.2);
+  }
+
+  .nav-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .nav-item.active .nav-icon {
+    background: rgba(124,92,252,0.15);
+  }
+
+  .nav-badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 100px;
+  }
+
+  .sidebar-profile {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sidebar-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .sidebar-user-info { flex: 1; min-width: 0; }
+
+  .sidebar-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sidebar-plan {
+    font-size: 0.7rem;
+    color: var(--accent2);
+    background: rgba(124,92,252,0.1);
+    padding: 1px 7px;
+    border-radius: 100px;
+    display: inline-block;
+    margin-top: 2px;
+  }
+
+  /* MAIN */
+  .main {
+    margin-left: 240px;
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: rgba(8,11,18,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  .topbar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .view-page-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(124,92,252,0.1);
+    border: 1px solid rgba(124,92,252,0.25);
+    border-radius: 100px;
+    padding: 8px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent2);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .view-page-btn:hover {
+    background: rgba(124,92,252,0.2);
+    border-color: rgba(124,92,252,0.4);
+  }
+
+  .notif-btn {
+    width: 36px; height: 36px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  .notif-btn:hover { border-color: var(--accent); }
+
+  .notif-dot {
+    position: absolute;
+    top: 6px; right: 7px;
+    width: 7px; height: 7px;
+    background: var(--accent3);
+    border-radius: 50%;
+    border: 1.5px solid var(--bg);
+  }
+
+  /* CONTENT */
+  .content {
+    padding: 28px;
+    flex: 1;
+  }
+
+  /* PANEL SYSTEM */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* STATS GRID */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.2s;
+  }
+
+  .stat-card:hover {
+    border-color: rgba(124,92,252,0.3);
+    transform: translateY(-2px);
+  }
+
+  .stat-card-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .stat-card-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+  }
+
+  .stat-card-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .stat-card-change {
+    font-size: 0.78rem;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .change-up { color: var(--green); }
+  .change-down { color: var(--red); }
+
+  /* CHART AREA */
+  .chart-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .chart-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+  }
+
+  .chart-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .chart-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .chart-filter {
+    display: flex; gap: 6px;
+  }
+
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-btn.active, .filter-btn:hover {
+    background: rgba(124,92,252,0.1);
+    border-color: var(--accent);
+    color: var(--accent2);
+  }
+
+  /* BAR CHART */
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 120px;
+  }
+
+  .bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .bar {
+    width: 100%;
+    background: rgba(124,92,252,0.2);
+    border-radius: 6px 6px 0 0;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .bar:hover { background: var(--accent); }
+
+  .bar-label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* TOP PRODUCTS */
+  .top-product {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .top-product:last-child { border-bottom: none; }
+
+  .top-product-rank {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+    width: 20px;
+    text-align: center;
+  }
+
+  .top-product-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .top-product-info { flex: 1; min-width: 0; }
+
+  .top-product-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+
+  .top-product-sales {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .top-product-revenue {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent3);
+  }
+
+  /* RECENT TRANSACTIONS */
+  .transactions-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 24px;
+  }
+
+  .tx-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .tx-item:last-child { border-bottom: none; }
+
+  .tx-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    flex-shrink: 0;
+  }
+
+  .tx-info { flex: 1; min-width: 0; }
+
+  .tx-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .tx-product {
+    font-size: 0.75rem;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tx-right { text-align: right; flex-shrink: 0; }
+
+  .tx-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 2px;
+  }
+
+  .tx-time {
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .tx-method {
+    font-size: 0.65rem;
+    background: rgba(124,92,252,0.1);
+    color: var(--accent2);
+    padding: 2px 8px;
+    border-radius: 100px;
+    display: inline-block;
+  }
+
+  /* PRODUCTS PANEL */
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+  }
+
+  .btn-add {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 0 16px rgba(124,92,252,0.3);
+  }
+
+  .btn-add:hover {
+    background: #8B6EFD;
+    transform: translateY(-1px);
+  }
+
+  /* COLLECTION TABS */
+  .collection-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+
+  .col-tab {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 7px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .col-tab:hover, .col-tab.active {
+    background: rgba(124,92,252,0.1);
+    border-color: var(--accent);
+    color: var(--accent2);
+  }
+
+  .col-tab-count {
+    background: rgba(124,92,252,0.15);
+    color: var(--accent2);
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    border-radius: 100px;
+  }
+
+  .col-tab.active .col-tab-count {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* PRODUCT TABLE */
+  .product-table {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .table-head {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 80px;
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 80px;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    align-items: center;
+    transition: background 0.2s;
+  }
+
+  .table-row:last-child { border-bottom: none; }
+  .table-row:hover { background: rgba(124,92,252,0.04); }
+
+  .table-product {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .table-thumb {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .table-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .table-type {
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .table-price {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--accent3);
+  }
+
+  .table-sales {
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+    display: inline-block;
+  }
+
+  .status-active {
+    background: rgba(16,185,129,0.1);
+    color: var(--green);
+    border: 1px solid rgba(16,185,129,0.2);
+  }
+
+  .status-draft {
+    background: rgba(100,116,139,0.1);
+    color: var(--muted);
+    border: 1px solid rgba(100,116,139,0.2);
+  }
+
+  .table-actions {
+    display: flex; gap: 6px; justify-content: flex-end;
+  }
+
+  .action-btn {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+    color: var(--muted);
+  }
+
+  .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* LIMIT BAR */
+  .limit-bar-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 16px;
+  }
+
+  .limit-info { flex: 1; }
+
+  .limit-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .limit-bar {
+    height: 5px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .limit-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .limit-count {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .upgrade-hint {
+    font-size: 0.72rem;
+    color: var(--accent2);
+    cursor: pointer;
+    text-decoration: underline;
+    white-space: nowrap;
+  }
+
+  /* WITHDRAW CARD */
+  .withdraw-card {
+    background: linear-gradient(135deg, rgba(124,92,252,0.12), rgba(245,158,11,0.06));
+    border: 1px solid rgba(124,92,252,0.25);
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 24px;
+    display: flex; align-items: center; gap: 20px;
+  }
+
+  .withdraw-balance { flex: 1; }
+
+  .withdraw-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .withdraw-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+
+  .withdraw-pending {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .withdraw-btn {
+    background: var(--accent3);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .withdraw-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(245,158,11,0.3);
+  }
+
+  /* MOBILE TOGGLE */
+  .mobile-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px; right: 20px;
+    width: 48px; height: 48px;
+    background: var(--accent);
+    border-radius: 50%;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(124,92,252,0.4);
+    font-size: 1.2rem;
+    border: none;
+    color: #fff;
+  }
+
+  /* ADD PRODUCT MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    width: 100%;
+    max-width: 480px;
+    animation: fadeUp 0.3s ease;
+    position: relative;
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+  }
+
+  .form-group { margin-bottom: 16px; }
+
+  .form-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input:focus { border-color: var(--accent); }
+  .form-input::placeholder { color: var(--muted); }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .modal-actions {
+    display: flex; gap: 10px; margin-top: 20px;
+  }
+
+  .btn-cancel {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-cancel:hover { border-color: var(--muted); color: var(--text); }
+
+  .btn-save {
+    flex: 2;
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-save:hover { background: #8B6EFD; }
+
+  .modal-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: var(--muted);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-row { grid-template-columns: 1fr; }
+    .table-head, .table-row { grid-template-columns: 2fr 1fr 1fr 80px; }
+    .table-head > *:nth-child(4), .table-row > *:nth-child(4) { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .mobile-toggle { display: flex; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .table-head, .table-row { grid-template-columns: 2fr 1fr 80px; }
+    .table-head > *:nth-child(3), .table-row > *:nth-child(3),
+    .table-head > *:nth-child(4), .table-row > *:nth-child(4) { display: none; }
+    .withdraw-card { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ADD PRODUCT MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">Add New Product</div>
+    <div class="form-group">
+      <label class="form-label">Product Name</label>
+      <input type="text" class="form-input" placeholder="e.g. Lightroom Preset Pack Vol.2">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Price (USD)</label>
+        <input type="number" class="form-input" placeholder="0.00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-select form-input">
+          <option>Digital Download</option>
+          <option>PDF</option>
+          <option>Video Course</option>
+          <option>Audio</option>
+          <option>Template</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Collection</label>
+      <select class="form-select form-input">
+        <option>— No Collection —</option>
+        <option>📁 Preset Packs</option>
+        <option>📁 eBooks & Guides</option>
+        <option>📁 Video Courses</option>
+        <option>+ Create New Collection</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input type="text" class="form-input" placeholder="Short description of your product">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="closeModal()">Save Product →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <a href="optra-landing.html" style="text-decoration:none;"><div class="logo">Opt<span>ra</span></div></a>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Main</div>
+      <a class="nav-item active" onclick="switchPanel('overview', this)">
+        <div class="nav-icon">📊</div>
+        Overview
+      </a>
+      <a class="nav-item" onclick="switchPanel('products', this)">
+        <div class="nav-icon">📦</div>
+        Products
+        <span class="nav-badge">3</span>
+      </a>
+      <a class="nav-item" onclick="switchPanel('links', this)">
+        <div class="nav-icon">🔗</div>
+        Links
+      </a>
+      <a class="nav-item" onclick="switchPanel('earnings', this)">
+        <div class="nav-icon">💰</div>
+        Earnings
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Manage</div>
+      <a class="nav-item" onclick="switchPanel('collections', this)">
+        <div class="nav-icon">📁</div>
+        Collections
+      </a>
+      <a class="nav-item" onclick="switchPanel('bookings', this)">
+        <div class="nav-icon">📅</div>
+        Bookings
+        <span class="nav-badge">2</span>
+      </a>
+      <a class="nav-item" onclick="switchPanel('tips', this)">
+        <div class="nav-icon">🙌</div>
+        Tips
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Account</div>
+      <a class="nav-item" onclick="switchPanel('settings', this)">
+        <div class="nav-icon">⚙️</div>
+        Settings
+      </a>
+      <a class="nav-item" onclick="switchPanel('upgrade', this)">
+        <div class="nav-icon">⚡</div>
+        Upgrade Plan
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-profile">
+    <div class="sidebar-avatar">JD</div>
+    <div class="sidebar-user-info">
+      <div class="sidebar-name">Jesse Daniels</div>
+      <div class="sidebar-plan">Creator Plan</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">Overview</div>
+    <div class="topbar-right">
+      <a href="optra-profile.html" target="_blank" class="view-page-btn">
+        👁 View My Page
+      </a>
+      <div class="notif-btn">
+        🔔
+        <div class="notif-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW PANEL -->
+    <div class="panel active" id="panel-overview">
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-label">
+            Total Earnings
+            <div class="stat-card-icon" style="background:rgba(245,158,11,0.1);">💰</div>
+          </div>
+          <div class="stat-card-val">$214</div>
+          <div class="stat-card-change change-up">↑ 18% this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">
+            Total Sales
+            <div class="stat-card-icon" style="background:rgba(16,185,129,0.1);">🛍</div>
+          </div>
+          <div class="stat-card-val">159</div>
+          <div class="stat-card-change change-up">↑ 12 this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">
+            Page Views
+            <div class="stat-card-icon" style="background:rgba(124,92,252,0.1);">👁</div>
+          </div>
+          <div class="stat-card-val">3.2K</div>
+          <div class="stat-card-change change-up">↑ 24% this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">
+            Tips Received
+            <div class="stat-card-icon" style="background:rgba(239,68,68,0.1);">🙌</div>
+          </div>
+          <div class="stat-card-val">$38</div>
+          <div class="stat-card-change change-down">↓ 3% this month</div>
+        </div>
+      </div>
+
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Revenue Overview</div>
+            <div class="chart-filter">
+              <button class="filter-btn active">7D</button>
+              <button class="filter-btn">30D</button>
+              <button class="filter-btn">90D</button>
+            </div>
+          </div>
+          <div class="bar-chart">
+            <div class="bar-wrap"><div class="bar" style="height:40%;"></div><div class="bar-label">Mon</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:65%;"></div><div class="bar-label">Tue</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:45%;"></div><div class="bar-label">Wed</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:80%;"></div><div class="bar-label">Thu</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:55%;"></div><div class="bar-label">Fri</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:90%; background:var(--accent);"></div><div class="bar-label">Sat</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:70%;"></div><div class="bar-label">Sun</div></div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Top Products</div>
+          </div>
+          <div class="top-product">
+            <div class="top-product-rank">#1</div>
+            <div class="top-product-icon" style="background:rgba(16,185,129,0.1);">🎬</div>
+            <div class="top-product-info">
+              <div class="top-product-name">TikTok Masterclass</div>
+              <div class="top-product-sales">89 sales</div>
+            </div>
+            <div class="top-product-revenue">$712</div>
+          </div>
+          <div class="top-product">
+            <div class="top-product-rank">#2</div>
+            <div class="top-product-icon" style="background:rgba(124,92,252,0.1);">🎨</div>
+            <div class="top-product-info">
+              <div class="top-product-name">Preset Pack Vol.1</div>
+              <div class="top-product-sales">47 sales</div>
+            </div>
+            <div class="top-product-revenue">$141</div>
+          </div>
+          <div class="top-product">
+            <div class="top-product-rank">#3</div>
+            <div class="top-product-icon" style="background:rgba(245,158,11,0.1);">📖</div>
+            <div class="top-product-info">
+              <div class="top-product-name">Content Strategy eBook</div>
+              <div class="top-product-sales">23 sales</div>
+            </div>
+            <div class="top-product-revenue">$46</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="transactions-card">
+        <div class="chart-header">
+          <div class="chart-title">Recent Transactions</div>
+          <div style="font-size:0.8rem;color:var(--accent2);cursor:pointer;">View all →</div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-avatar" style="background:rgba(16,185,129,0.1);color:var(--green);">AK</div>
+          <div class="tx-info">
+            <div class="tx-name">Ama Kofi</div>
+            <div class="tx-product">TikTok Growth Masterclass</div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amount">+$8.00</div>
+            <div class="tx-time">2 mins ago · <span class="tx-method">Paystack</span></div>
+          </div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-avatar" style="background:rgba(124,92,252,0.1);color:var(--accent2);">TO</div>
+          <div class="tx-info">
+            <div class="tx-name">Tunde Okafor</div>
+            <div class="tx-product">Lightroom Preset Pack</div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amount">+$3.00</div>
+            <div class="tx-time">18 mins ago · <span class="tx-method">Flutterwave</span></div>
+          </div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-avatar" style="background:rgba(245,158,11,0.1);color:var(--accent3);">EB</div>
+          <div class="tx-info">
+            <div class="tx-name">Efua Boateng</div>
+            <div class="tx-product">Tip 🙌</div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amount">+$5.00</div>
+            <div class="tx-time">1 hr ago · <span class="tx-method">Mobile Money</span></div>
+          </div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-avatar" style="background:rgba(239,68,68,0.1);color:var(--red);">CN</div>
+          <div class="tx-info">
+            <div class="tx-name">Chidi Nwosu</div>
+            <div class="tx-product">Content Strategy eBook</div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amount">+$2.00</div>
+            <div class="tx-time">3 hrs ago · <span class="tx-method">Paystack</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PRODUCTS PANEL -->
+    <div class="panel" id="panel-products">
+      <div class="panel-header">
+        <div class="panel-title">Products</div>
+        <button class="btn-add" onclick="openModal()">+ Add Product</button>
+      </div>
+
+      <div class="limit-bar-wrap">
+        <div class="limit-info">
+          <div class="limit-label">Products used — Creator Plan (25 max)</div>
+          <div class="limit-bar">
+            <div class="limit-fill" style="width:12%;"></div>
+          </div>
+        </div>
+        <div class="limit-count">3 / 25</div>
+        <div class="upgrade-hint" onclick="switchPanel('upgrade', null)">Upgrade for unlimited →</div>
+      </div>
+
+      <div class="collection-tabs">
+        <div class="col-tab active">All <span class="col-tab-count">3</span></div>
+        <div class="col-tab">📁 Preset Packs <span class="col-tab-count">1</span></div>
+        <div class="col-tab">📁 eBooks & Guides <span class="col-tab-count">1</span></div>
+        <div class="col-tab">📁 Video Courses <span class="col-tab-count">1</span></div>
+        <div class="col-tab" style="border-style:dashed;">+ New Collection</div>
+      </div>
+
+      <div class="product-table">
+        <div class="table-head">
+          <div>Product</div>
+          <div>Price</div>
+          <div>Sales</div>
+          <div>Status</div>
+          <div></div>
+        </div>
+        <div class="table-row">
+          <div class="table-product">
+            <div class="table-thumb" style="background:rgba(16,185,129,0.1);">🎬</div>
+            <div>
+              <div class="table-name">TikTok Growth Masterclass</div>
+              <div class="table-type">Video Course · 📁 Video Courses</div>
+            </div>
+          </div>
+          <div class="table-price">$8</div>
+          <div class="table-sales">89</div>
+          <div><span class="status-badge status-active">Active</span></div>
+          <div class="table-actions">
+            <div class="action-btn">✏️</div>
+            <div class="action-btn">🗑</div>
+          </div>
+        </div>
+        <div class="table-row">
+          <div class="table-product">
+            <div class="table-thumb" style="background:rgba(124,92,252,0.1);">🎨</div>
+            <div>
+              <div class="table-name">Lightroom Preset Pack Vol.1</div>
+              <div class="table-type">Digital Download · 📁 Preset Packs</div>
+            </div>
+          </div>
+          <div class="table-price">$3</div>
+          <div class="table-sales">47</div>
+          <div><span class="status-badge status-active">Active</span></div>
+          <div class="table-actions">
+            <div class="action-btn">✏️</div>
+            <div class="action-btn">🗑</div>
+          </div>
+        </div>
+        <div class="table-row">
+          <div class="table-product">
+            <div class="table-thumb" style="background:rgba(245,158,11,0.1);">📖</div>
+            <div>
+              <div class="table-name">Content Strategy eBook</div>
+              <div class="table-type">PDF · 📁 eBooks & Guides</div>
+            </div>
+          </div>
+          <div class="table-price">$2</div>
+          <div class="table-sales">23</div>
+          <div><span class="status-badge status-draft">Draft</span></div>
+          <div class="table-actions">
+            <div class="action-btn">✏️</div>
+            <div class="action-btn">🗑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EARNINGS PANEL -->
+    <div class="panel" id="panel-earnings">
+      <div class="panel-header">
+        <div class="panel-title">Earnings</div>
+      </div>
+      <div class="withdraw-card">
+        <div class="withdraw-balance">
+          <div class="withdraw-label">Available Balance</div>
+          <div class="withdraw-amount">$189.40</div>
+          <div class="withdraw-pending">$24.60 pending clearance</div>
+        </div>
+        <button class="withdraw-btn">Withdraw via Optra Pay →</button>
+      </div>
+      <div class="transactions-card">
+        <div class="chart-header">
+          <div class="chart-title">All Transactions</div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-avatar" style="background:rgba(16,185,129,0.1);color:var(--green);">AK</div>
+          <div class="tx-info"><div class="tx-name">Ama Kofi</div><div class="tx-product">TikTok Growth Masterclass</div></div>
+          <div class="tx-right"><div class="tx-amount">+$8.00</div><div class="tx-time">Today · <span class="tx-method">Paystack</span></div></div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-avatar" style="background:rgba(124,92,252,0.1);color:var(--accent2);">TO</div>
+          <div class="tx-info"><div class="tx-name">Tunde Okafor</div><div class="tx-product">Preset Pack</div></div>
+          <div class="tx-right"><div class="tx-amount">+$3.00</div><div class="tx-time">Today · <span class="tx-method">Flutterwave</span></div></div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-avatar" style="background:rgba(245,158,11,0.1);color:var(--accent3);">EB</div>
+          <div class="tx-info"><div class="tx-name">Efua Boateng</div><div class="tx-product">Tip 🙌</div></div>
+          <div class="tx-right"><div class="tx-amount">+$5.00</div><div class="tx-time">Yesterday · <span class="tx-method">Mobile Money</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLACEHOLDER PANELS -->
+    <div class="panel" id="panel-links">
+      <div class="panel-header">
+        <div class="panel-title">Links</div>
+        <button class="btn-add">+ Add Link</button>
+      </div>
+      <div class="limit-bar-wrap">
+        <div class="limit-info">
+          <div class="limit-label">Links used — Creator Plan (9 max)</div>
+          <div class="limit-bar"><div class="limit-fill" style="width:33%;"></div></div>
+        </div>
+        <div class="limit-count">3 / 9</div>
+      </div>
+      <div class="product-table">
+        <div class="table-head" style="grid-template-columns:2fr 1fr 80px;">
+          <div>Link</div><div>Clicks</div><div></div>
+        </div>
+        <div class="table-row" style="grid-template-columns:2fr 1fr 80px;">
+          <div class="table-product"><div class="table-thumb" style="background:rgba(255,0,80,0.1);">📱</div><div><div class="table-name">My TikTok Page</div><div class="table-type">tiktok.com/@jesse</div></div></div>
+          <div class="table-sales">1,240</div>
+          <div class="table-actions"><div class="action-btn">✏️</div><div class="action-btn">🗑</div></div>
+        </div>
+        <div class="table-row" style="grid-template-columns:2fr 1fr 80px;">
+          <div class="table-product"><div class="table-thumb" style="background:rgba(255,0,0,0.1);">🎬</div><div><div class="table-name">YouTube Channel</div><div class="table-type">youtube.com/@jesse</div></div></div>
+          <div class="table-sales">890</div>
+          <div class="table-actions"><div class="action-btn">✏️</div><div class="action-btn">🗑</div></div>
+        </div>
+        <div class="table-row" style="grid-template-columns:2fr 1fr 80px;">
+          <div class="table-product"><div class="table-thumb" style="background:rgba(124,92,252,0.1);">📸</div><div><div class="table-name">Instagram</div><div class="table-type">instagram.com/@jesse</div></div></div>
+          <div class="table-sales">560</div>
+          <div class="table-actions"><div class="action-btn">✏️</div><div class="action-btn">🗑</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-collections">
+      <div class="panel-header">
+        <div class="panel-title">Collections</div>
+        <button class="btn-add">+ New Collection</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:8px;">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(124,92,252,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:1.8rem;margin-bottom:10px;">🎨</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:4px;">Preset Packs</div>
+          <div style="font-size:0.8rem;color:var(--muted);">1 product</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(124,92,252,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:1.8rem;margin-bottom:10px;">📖</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:4px;">eBooks & Guides</div>
+          <div style="font-size:0.8rem;color:var(--muted);">1 product</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(124,92,252,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:1.8rem;margin-bottom:10px;">🎬</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:4px;">Video Courses</div>
+          <div style="font-size:0.8rem;color:var(--muted);">1 product</div>
+        </div>
+        <div style="background:transparent;border:1px dashed var(--border);border-radius:16px;padding:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:1.5rem;">+</div>
+          <div style="font-size:0.85rem;color:var(--muted);">New Collection</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-bookings">
+      <div class="panel-header"><div class="panel-title">Bookings</div></div>
+      <div class="transactions-card">
+        <div class="chart-header"><div class="chart-title">Pending Requests</div></div>
+        <div class="tx-item">
+          <div class="tx-avatar" style="background:rgba(245,158,11,0.1);color:var(--accent3);">KA</div>
+          <div class="tx-info"><div class="tx-name">Kwame Asante</div><div class="tx-product">1-on-1 Strategy Session · Tomorrow 3PM</div></div>
+          <div class="tx-right"><div class="tx-amount" style="color:var(--accent3);">Pending</div><div class="tx-time"><span class="tx-method">Paystack</span></div></div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-avatar" style="background:rgba(124,92,252,0.1);color:var(--accent2);">NN</div>
+          <div class="tx-info"><div class="tx-name">Ngozi Nwosu</div><div class="tx-product">Brand Consulting · Friday 2PM</div></div>
+          <div class="tx-right"><div class="tx-amount" style="color:var(--accent3);">Pending</div><div class="tx-time"><span class="tx-method">Flutterwave</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-tips">
+      <div class="panel-header"><div class="panel-title">Tips</div></div>
+      <div class="transactions-card">
+        <div class="chart-header"><div class="chart-title">Recent Tips</div></div>
+        <div class="tx-item">
+          <div class="tx-avatar" style="background:rgba(245,158,11,0.1);color:var(--accent3);">EB</div>
+          <div class="tx-info"><div class="tx-name">Efua Boateng</div><div class="tx-product">"Love your content! Keep going 🔥"</div></div>
+          <div class="tx-right"><div class="tx-amount">+$5.00</div><div class="tx-time">1 hr ago · <span class="tx-method">Mobile Money</span></div></div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-avatar" style="background:rgba(16,185,129,0.1);color:var(--green);">DM</div>
+          <div class="tx-info"><div class="tx-name">David Mensah</div><div class="tx-product">"The preset pack was 🔥"</div></div>
+          <div class="tx-right"><div class="tx-amount">+$3.00</div><div class="tx-time">Yesterday · <span class="tx-method">Paystack</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-settings">
+      <div class="panel-header"><div class="panel-title">Settings</div></div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:500px;">
+        <div class="form-group"><label class="form-label">Display Name</label><input type="text" class="form-input" value="Jesse Daniels"></div>
+        <div class="form-group"><label class="form-label">Handle</label><input type="text" class="form-input" value="@jesse"></div>
+        <div class="form-group"><label class="form-label">Bio</label><input type="text" class="form-input" value="Content creator · Digital products · Helping African creators monetize their craft 🌍"></div>
+        <div class="form-group"><label class="form-label">Default Currency</label>
+          <select class="form-select form-input"><option>USD</option><option>GHS</option><option>NGN</option></select>
+        </div>
+        <button class="btn-save" style="width:100%;margin-top:8px;">Save Changes</button>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-upgrade">
+      <div class="panel-header"><div class="panel-title">Upgrade Plan</div></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;">
+          <div style="font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Free</div>
+          <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:16px;">$0</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:0.85rem;color:var(--muted);">
+            <li>✓ 5 products</li><li>✓ 2 links</li><li>✓ Fan tipping</li><li style="opacity:0.4;">✗ Collections</li><li style="opacity:0.4;">✗ Analytics</li>
+          </ul>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(124,92,252,0.1),rgba(124,92,252,0.05));border:1px solid rgba(124,92,252,0.4);border-radius:16px;padding:24px;position:relative;">
+          <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:0.7rem;font-weight:700;padding:3px 14px;border-radius:100px;letter-spacing:0.05em;">CURRENT PLAN</div>
+          <div style="font-size:0.75rem;color:var(--accent2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Creator</div>
+          <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:16px;">$4<span style="font-size:1rem;font-weight:400;color:var(--muted);">/mo</span></div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:0.85rem;color:var(--muted);">
+            <li style="color:var(--text);">✓ 25 products</li><li style="color:var(--text);">✓ 9 links</li><li style="color:var(--text);">✓ Collections (5)</li><li style="color:var(--text);">✓ Analytics</li><li style="color:var(--text);">✓ Paystack + Flutterwave</li>
+          </ul>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;">
+          <div style="font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Pro</div>
+          <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:16px;">$9<span style="font-size:1rem;font-weight:400;color:var(--muted);">/mo</span></div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:0.85rem;color:var(--muted);">
+            <li>✓ Unlimited products</li><li>✓ Unlimited links</li><li>✓ Unlimited collections</li><li>✓ Custom domain</li><li>✓ Priority support</li>
+          </ul>
+          <button class="btn-save" style="width:100%;margin-top:16px;border:none;padding:12px;border-radius:10px;">Upgrade to Pro →</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MOBILE TOGGLE -->
+<button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+
+<script>
+  function switchPanel(name, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (el) el.classList.add('active');
+    const titles = {
+      overview: 'Overview', products: 'Products', links: 'Links',
+      earnings: 'Earnings', collections: 'Collections', bookings: 'Bookings',
+      tips: 'Tips', settings: 'Settings', upgrade: 'Upgrade Plan'
+    };
+    document.getElementById('topbarTitle').textContent = titles[name] || name;
+    if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+  }
+
+  function openModal() { document.getElementById('addModal').classList.add('open'); }
+  function closeModal() { document.getElementById('addModal').classList.remove('open'); }
+  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+  document.getElementById('addModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.closest('.chart-filter').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.col-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.col-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
